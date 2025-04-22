@@ -2,7 +2,6 @@ package hu.gina.tkweatherapp.data
 
 import kotlinx.serialization.Serializable
 
-
 @Serializable
 data class Location(
     val lat: Double? = null,

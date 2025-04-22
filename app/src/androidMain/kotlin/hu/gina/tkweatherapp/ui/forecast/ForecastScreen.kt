@@ -35,10 +35,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import hu.gina.tkweatherapp.MainActivity
-import hu.gina.tkweatherapp.apiservice.WeatherDependencies
-import hu.gina.tkweatherapp.ui.utils.BigText
+import hu.gina.tkweatherapp.ui.componenets.BigText
 import hu.gina.tkweatherapp.ui.utils.CustomSnackBarVisuals
-import hu.gina.tkweatherapp.ui.utils.SmallText
+import hu.gina.tkweatherapp.ui.componenets.ProgressDialog
+import hu.gina.tkweatherapp.ui.componenets.SmallText
 import hu.gina.tkweatherapp.ui.utils.UiEvent
 import hu.gina.tkweatherapp.ui.utils.disableSplitMotionEvents
 import hu.gina.tkweatherapp.ui.utils.setDefaultStyle
@@ -51,9 +51,7 @@ fun ForecastScreen(
     navController: NavHostController,
     activity: MainActivity
 ) {
-
-    val factory = remember { ForecastViewModelFactory(WeatherDependencies.provideRepository()) }
-    val viewModel: ForecastViewModel = viewModel(factory = factory)
+    val viewModel: ForecastViewModel = viewModel(factory = ForecastViewModelFactory())
     val items = viewModel.weatherData.collectAsState(initial = null)
     val locationName = viewModel.location.collectAsState(initial = "")
     val progressState: Boolean by viewModel.showProgressDialog.collectAsState()

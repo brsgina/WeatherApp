@@ -18,30 +18,25 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import hu.gina.tkweatherapp.R
-import hu.gina.tkweatherapp.apiservice.WeatherDependencies
 import hu.gina.tkweatherapp.data.DataValuesDaily
 import hu.gina.tkweatherapp.data.WeatherCode
-import hu.gina.tkweatherapp.ui.utils.BigText
-import hu.gina.tkweatherapp.ui.utils.DataRow
-import hu.gina.tkweatherapp.ui.utils.MediumText
-import hu.gina.tkweatherapp.ui.utils.SmallText
-import hu.gina.tkweatherapp.ui.utils.TinyText
+import hu.gina.tkweatherapp.ui.componenets.BigText
+import hu.gina.tkweatherapp.ui.componenets.DataRow
+import hu.gina.tkweatherapp.ui.componenets.MediumText
+import hu.gina.tkweatherapp.ui.componenets.SmallText
+import hu.gina.tkweatherapp.ui.componenets.TinyText
 import hu.gina.tkweatherapp.ui.utils.setDefaultStyle
 import hu.gina.tkweatherapp.utils.calculateFullDaySunProgress
 import hu.gina.tkweatherapp.utils.formattedTime
@@ -54,8 +49,7 @@ fun DetailsScreen(
     navController: NavHostController
 ) {
 
-    val factory = remember { DetailsViewModelFactory(WeatherDependencies.provideRepository()) }
-    val viewModel: DetailsViewModel = viewModel(factory = factory)
+    val viewModel: DetailsViewModel = viewModel(factory = DetailsViewModelFactory())
     val details = viewModel.weatherData.collectAsState()
 
     Column {

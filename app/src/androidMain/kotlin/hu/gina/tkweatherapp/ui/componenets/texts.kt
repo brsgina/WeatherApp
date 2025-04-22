@@ -1,4 +1,4 @@
-package hu.gina.tkweatherapp.ui.utils
+package hu.gina.tkweatherapp.ui.componenets
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

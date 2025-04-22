@@ -20,19 +20,16 @@ class DetailsViewModel(
     private val _title = MutableStateFlow("")
     val title: StateFlow<String> = _title
 
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage
-
     init {
         savedStateHandle.get<String>(KEY_DAY_TIMESTAMP)?.let {
-            updateWeatherData(it)
+            loadWeatherData(it)
         }
         savedStateHandle.get<String>(KEY_DAY_NAME)?.let {
             _title.value = it
         }
     }
 
-    private fun updateWeatherData(dayTimeStamp: String) {
+    private fun loadWeatherData(dayTimeStamp: String) {
         val data =  weatherRepo.getWeatherDetails(dayTimeStamp)
         _weatherData.value = data
     }

@@ -7,7 +7,6 @@ import hu.gina.tkweatherapp.ui.utils.KEY_DAY_NAME
 import hu.gina.tkweatherapp.ui.utils.KEY_DAY_TIMESTAMP
 import hu.gina.tkweatherapp.ui.utils.Routes
 import hu.gina.tkweatherapp.ui.utils.UiEvent
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -3,7 +3,6 @@ package hu.gina.tkweatherapp.data
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
-
 @Serializable
 data class DataValuesDaily(
     val cloudBaseAvg: Double = 0.0,

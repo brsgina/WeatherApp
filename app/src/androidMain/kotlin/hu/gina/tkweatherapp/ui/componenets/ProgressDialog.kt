@@ -1,4 +1,4 @@
-package hu.gina.tkweatherapp.ui.forecast
+package hu.gina.tkweatherapp.ui.componenets
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
