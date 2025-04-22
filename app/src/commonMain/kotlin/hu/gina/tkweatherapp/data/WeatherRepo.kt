@@ -1,0 +1,49 @@
+package hu.gina.tkweatherapp.data
+
+import hu.gina.tkweatherapp.apiservice.WeatherApi
+import hu.gina.tkweatherapp.utils.formattedDate
+import hu.gina.tkweatherapp.utils.getDayDisplayName
+import kotlinx.datetime.Instant
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+
+class WeatherRepo(private val weatherApi: WeatherApi) {
+
+    @OptIn(ExperimentalSerializationApi::class)
+    private val jsonDecoder = Json {
+        ignoreUnknownKeys = true
+        explicitNulls = false
+    }
+
+    private var currentData: WeatherForecast? = null
+
+    suspend fun updateWeatherData() {
+        val data = weatherApi.getWeather()
+        data.getOrNull()?.let {
+            try {
+                val result = jsonDecoder.decodeFromString(WeatherForecast.serializer(), it)
+                currentData = result
+            } catch (ex: Exception)  {
+                ex.printStackTrace()
+
+            }
+        }
+    }
+
+    fun getLocation(): String {
+        return currentData?.location?.name ?: ""
+    }
+
+    fun getWeatherDays(): Map<Instant, Pair<String, String>> {
+        return currentData?.timelines?.daily?.associate {
+            it.time to Pair(
+                it.time.getDayDisplayName(),
+                it.time.formattedDate()
+            )
+        } ?: emptyMap()
+    }
+
+    fun getWeatherDetails(day: String): DataValuesDaily? {
+        return currentData?.timelines?.daily?.find { it.time == Instant.parse(day) }?.values
+    }
+}
