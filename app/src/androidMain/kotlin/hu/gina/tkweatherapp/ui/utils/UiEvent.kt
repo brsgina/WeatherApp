@@ -4,7 +4,9 @@ sealed class UiEvent {
 
     data class Navigate(val route: String) : UiEvent()
 
-    object PopBackStack : UiEvent()
-
-    data class ShowError(val message: String) : UiEvent()
+    data class ShowError(
+        val message: String,
+        val actionLabel: String? = null,
+        val onPerformAction: suspend () -> Unit = {}
+    ) : UiEvent()
 }

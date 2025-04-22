@@ -32,19 +32,19 @@ fun Instant.formattedTime(timeZone: TimeZone = TimeZone.currentSystemDefault()):
     return localTime.toJavaLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"))
 }
 
+private const val MINUTES_OF_HOUR = 60
+private const val HOURS_OF_DAY = 24f
+
 fun calculateFullDaySunProgress(
     sunrise: Instant?,
     sunset: Instant?
 ): Float {
     if (sunset == null || sunrise == null) return 0f
-    val now = Clock.System.now()
     val timeZone = TimeZone.currentSystemDefault()
+    val localTime = Clock.System.now().toLocalDateTime(timeZone).time
 
-    val localDateTime = now.toLocalDateTime(timeZone)
-    val localTime = localDateTime.time
-
-    val minutesSinceMidnight = localTime.hour * 60 + localTime.minute
-    val progress = minutesSinceMidnight / (24f * 60f) // progress: 0.0–1.0
+    val minutesSinceMidnight = localTime.hour * MINUTES_OF_HOUR + localTime.minute
+    val progress = minutesSinceMidnight / (HOURS_OF_DAY * MINUTES_OF_HOUR.toFloat()) // progress: 0.0–1.0
 
     return progress
 }

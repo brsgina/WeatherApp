@@ -1,6 +1,7 @@
 package hu.gina.tkweatherapp.data
 
 import hu.gina.tkweatherapp.apiservice.WeatherApi
+import hu.gina.tkweatherapp.apiservice.WeatherResult
 import hu.gina.tkweatherapp.utils.formattedDate
 import hu.gina.tkweatherapp.utils.getDayDisplayName
 import kotlinx.datetime.Instant
@@ -17,17 +18,13 @@ class WeatherRepo(private val weatherApi: WeatherApi) {
 
     private var currentData: WeatherForecast? = null
 
-    suspend fun updateWeatherData() {
-        val data = weatherApi.getWeather()
-        data.getOrNull()?.let {
-            try {
-                val result = jsonDecoder.decodeFromString(WeatherForecast.serializer(), it)
-                currentData = result
-            } catch (ex: Exception)  {
-                ex.printStackTrace()
-
-            }
+    suspend fun updateWeatherData(): WeatherResult {
+        val result = weatherApi.getWeather()
+        if (result is WeatherResult.Success) {
+            val data = jsonDecoder.decodeFromString(WeatherForecast.serializer(), result.data)
+            currentData = data
         }
+        return result
     }
 
     fun getLocation(): String {

@@ -1,8 +1,7 @@
 package hu.gina.tkweatherapp.ui.forecast
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,17 +11,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -31,10 +37,12 @@ import androidx.navigation.NavHostController
 import hu.gina.tkweatherapp.MainActivity
 import hu.gina.tkweatherapp.apiservice.WeatherDependencies
 import hu.gina.tkweatherapp.ui.utils.BigText
+import hu.gina.tkweatherapp.ui.utils.CustomSnackBarVisuals
 import hu.gina.tkweatherapp.ui.utils.SmallText
 import hu.gina.tkweatherapp.ui.utils.UiEvent
 import hu.gina.tkweatherapp.ui.utils.disableSplitMotionEvents
 import hu.gina.tkweatherapp.ui.utils.setDefaultStyle
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 
 
@@ -48,6 +56,10 @@ fun ForecastScreen(
     val viewModel: ForecastViewModel = viewModel(factory = factory)
     val items = viewModel.weatherData.collectAsState(initial = null)
     val locationName = viewModel.location.collectAsState(initial = "")
+    val progressState: Boolean by viewModel.showProgressDialog.collectAsState()
+    val snackBarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val errorColor = MaterialTheme.colorScheme.error
 
     BackHandler {
         activity.finish()
@@ -57,22 +69,52 @@ fun ForecastScreen(
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is UiEvent.Navigate -> navController.navigate(event.route)
-                else -> { /* do nothing here */
+                is UiEvent.ShowError -> coroutineScope.launch {
+                    Log.d("ERROR", "Error is arrived!!!")
+                    snackBarHostState.currentSnackbarData?.dismiss()
+                    val result = snackBarHostState.showSnackbar(
+                        CustomSnackBarVisuals(
+                            message = event.message,
+                            actionLabel = event.actionLabel,
+                            containerColor = errorColor,
+                            duration = event.actionLabel?.let { SnackbarDuration.Indefinite }
+                                ?: SnackbarDuration.Short
+                        )
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        event.onPerformAction()
+                    }
                 }
             }
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        BigText("Weather forecast", verticalPadding = 16.dp)
-        Row(modifier = Modifier.padding(bottom = 12.dp)) {
-            Icon(Icons.Default.LocationOn, "Location")
-            Text(locationName.value)
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackBarHostState) { data ->
+                val customVisuals = data.visuals as? CustomSnackBarVisuals
+                customVisuals?.let {
+                    Snackbar(snackbarData = data, containerColor = customVisuals.containerColor)
+                } ?: Snackbar(snackbarData = data)
+            }
         }
-        DayList(items, viewModel)
+    ) { paddingValue ->
+        ProgressDialog(show = progressState)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(paddingValue),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            BigText("Weather forecast", verticalPadding = 16.dp)
+            Row(modifier = Modifier.padding(bottom = 12.dp)) {
+                locationName.value.takeUnless { it.isBlank() }?.let {
+                    Icon(Icons.Default.LocationOn, "Location")
+                    Text(locationName.value)
+                }
+            }
+            DayList(items, viewModel)
+        }
     }
 }
 
